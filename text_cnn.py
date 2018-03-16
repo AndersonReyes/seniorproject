@@ -4,7 +4,6 @@ from keras.layers import Dense, Conv1D, MaxPool1D, concatenate
 from keras.layers import Dropout, Flatten, Input
 from keras.models import Model
 from keras.layers.embeddings import Embedding
-from keras.preprocessing import sequence
 
 class TextCNN:
 
@@ -56,9 +55,17 @@ class TextCNN:
         
         print(self.model.summary())
 
-    def fit(self, X, Y, X_test, Y_test, batch_size=256, epochs=20):
+    def fit(self, X, Y, X_test, Y_test, batch_size=256, epochs=20, savename='lstm'):
         self.model.fit(X, Y, validation_data=(X_test, Y_test),
                        batch_size=batch_size, epochs=epochs)
+        
+        # save the model
+        # serialize model to JSON
+        model_json = self.model.to_json()
+        with open('./models/{}.json'.format(savename), 'w') as json_file:
+            json_file.write(model_json)
+        # serialize weights to HDF5
+        self.model.save_weights('./models/{}.h5'.format(savename))
 
     def predict(self, X, Y):
         return self.model.predict(X, Y)
